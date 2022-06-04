@@ -15,6 +15,16 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       select: false,
     },
+    password: {
+      type: String,
+      required: [true, '請輸入您的密碼'],
+      minlength: 8,
+      select: false,
+    },
+    sex: {
+      type: String,
+      enum: ['male', 'female'],
+    },
     photo: {
       type: String,
       default: '',
