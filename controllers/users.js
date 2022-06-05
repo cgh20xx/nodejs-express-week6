@@ -182,7 +182,7 @@ const users = {
   },
 
   /**
-   * 重設密碼 (修改單筆使用者的密碼)
+   * 重設密碼 (需登入)
    * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.findByIdAndUpdate
    */
   async updatPassword(req, res, next) {
@@ -237,10 +237,8 @@ const users = {
     const user = await UserModel.findByIdAndUpdate(req.user.id, {
       password: newPassword,
     });
-    //  產生 jwt token
-    const token = generateJWT(user._id);
 
-    successResponse(res, { token, name: user.name });
+    successResponse(res, user);
   },
   /**
    * 取得個人資料 (需登入)
@@ -248,7 +246,6 @@ const users = {
    */
   async getProfile(req, res, next) {
     // 注意：req.user 在 isAuth middleware 驗証成功後會自動帶入的。
-    console.log('getProfile req.user:', req.user);
     successResponse(res, req.user);
   },
   /**
