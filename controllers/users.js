@@ -265,31 +265,22 @@ const users = {
     const allUser = await UserModel.find();
     successResponse(res, allUser);
   },
-
-  /**
-   * 取得單筆使用者
-   * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.findById
-   */
-  async getUserById(req, res, next) {
-    console.log('getUserById');
-    successResponse(res, { getUserById: 1 });
-  },
   /**
    * 修改單筆使用者
    * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.findByIdAndUpdate
    */
   async updateUserById(req, res, next) {
-    const { body } = req;
+    let { email, name, photo } = req.body;
     const id = req.params.id;
-    if (body.email !== undefined)
+    if (email !== undefined)
       return next(
         new AppError({
           statusCode: 400,
           message: '[修改使用者失敗] 不可修改 email',
         })
       );
-    body.name = body.name?.trim(); // 頭尾去空白
-    if (!body.name)
+    name = name?.trim(); // 頭尾去空白
+    if (!name)
       return next(
         new AppError({
           statusCode: 400,
@@ -299,8 +290,8 @@ const users = {
     const updateUserById = await UserModel.findByIdAndUpdate(
       id,
       {
-        name: body.name,
-        photo: body.photo,
+        name,
+        photo,
       },
       {
         // 加這行才會返回更新後的資料，否則為更新前的資料。

@@ -36,9 +36,6 @@ router.patch(
 // 取得所有使用者
 router.get('/users', handleErrorAsync(UsersController.getUsers));
 
-// 取得單筆使用者
-router.get('/user/:id', handleErrorAsync(UsersController.getUserById));
-
 // 修改單筆使用者
 router.patch('/user/:id', handleErrorAsync(UsersController.updateUserById));
 
