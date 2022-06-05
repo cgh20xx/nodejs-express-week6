@@ -254,39 +254,31 @@ const users = {
    */
   async updateProfile(req, res, next) {
     // 注意：req.user 在 isAuth middleware 驗証成功後會自動帶入的。
-    console.log('updateProfile req.user:', req.user);
-    successResponse(res, req.user);
-  },
-  /**
-   * 取得所有使用者
-   * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.find
-   */
-  async getUsers(req, res, next) {
-    const allUser = await UserModel.find();
-    successResponse(res, allUser);
-  },
-  /**
-   * 修改單筆使用者
-   * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.findByIdAndUpdate
-   */
-  async updateUserById(req, res, next) {
+    // console.log(req.user.id); // 629cd7d3bd9015cec13961b7
+    // console.log(req.user._id);  // new ObjectId("629cd7d3bd9015cec13961b7")
     let { email, name, photo } = req.body;
-    const id = req.params.id;
-    if (email !== undefined)
+    const { id } = req.user;
+
+    // 檢查 name 空值
+    name = name?.trim();
+    if (!name) {
       return next(
         new AppError({
           statusCode: 400,
-          message: '[修改使用者失敗] 不可修改 email',
+          message: '[修改個人資料失敗] name 未填寫',
         })
       );
-    name = name?.trim(); // 頭尾去空白
-    if (!name)
+    }
+
+    if (email !== undefined) {
       return next(
         new AppError({
           statusCode: 400,
-          message: '[修改使用者失敗] name 未填寫',
+          message: '[修改個人資料失敗] 不可修改 email',
         })
       );
+    }
+
     const updateUserById = await UserModel.findByIdAndUpdate(
       id,
       {
@@ -304,9 +296,67 @@ const users = {
       return next(
         new AppError({
           statusCode: 400,
+          message: '[修改個人資料失敗] 沒有此 id',
+        })
+      );
+    successResponse(res, updateUserById);
+  },
+  /**
+   * 取得所有使用者
+   * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.find
+   */
+  async getUsers(req, res, next) {
+    const allUser = await UserModel.find();
+    successResponse(res, allUser);
+  },
+  /**
+   * 修改單筆使用者
+   * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.findByIdAndUpdate
+   */
+  async updateUserById(req, res, next) {
+    let { email, name, photo } = req.body;
+    const id = req.params.id;
+    if (email !== undefined) {
+      return next(
+        new AppError({
+          statusCode: 400,
+          message: '[修改使用者失敗] 不可修改 email',
+        })
+      );
+    }
+
+    name = name?.trim(); // 頭尾去空白
+    if (!name) {
+      return next(
+        new AppError({
+          statusCode: 400,
+          message: '[修改使用者失敗] name 未填寫',
+        })
+      );
+    }
+
+    const updateUserById = await UserModel.findByIdAndUpdate(
+      id,
+      {
+        name,
+        photo,
+      },
+      {
+        // 加這行才會返回更新後的資料，否則為更新前的資料。
+        returnDocument: 'after',
+        // update 相關語法預設 runValidators: false，需手動設寪 true。Doc:https://mongoosejs.com/docs/validation.html#update-validators
+        runValidators: true,
+      }
+    );
+    if (!updateUserById) {
+      return next(
+        new AppError({
+          statusCode: 400,
           message: '[修改使用者失敗] 沒有此 id',
         })
       );
+    }
+
     successResponse(res, updateUserById);
   },
   /**
@@ -324,13 +374,15 @@ const users = {
   async deleteUserById(req, res, next) {
     const id = req.params.id;
     const deleteUserById = await UserModel.findByIdAndDelete(id);
-    if (!deleteUserById)
+    if (!deleteUserById) {
       return next(
         new AppError({
           statusCode: 400,
           message: '[刪除使用者失敗] 沒有此 id',
         })
       );
+    }
+
     successResponse(res, deleteUserById);
   },
 };
