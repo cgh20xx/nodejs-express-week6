@@ -1,19 +1,14 @@
 # nodejs-express-week6
 ## LV1：設計五個會員相關 API
-- 註冊會員 (新增單筆使用者)
-`router.post('/user/sign_up')`
+- 註冊會員 (取得JWT) `router.post('/user/sign_up')`
+- 會員登入 (取得JWT) `router.post('/user/log_in')`
+- 重設密碼 (需登入) `router.post('/user/update_password')`
+- 取得個人資料 (需登入) `router.get('/user/:id')`
+- 更新個人資料 (需登入) `router.patch('/user/:id')`
 
-- 登入 (發 JWT)
-`router.post('/user/log_in')`
-
-- 重設密碼
-`router.post('/user/update_password')`
-
-- 取得個人資料 (取得單筆使用者)
-`router.get('/user/:id')`
-
-- 更新個人資料 (修改單筆使用者)
-`router.patch('/user/:id')`
+## LV2：調整第四週 API，都加上登入驗證的 middleware
+- 觀看所有貼文 `router.get('/posts')`
+- 張貼個人貼文 `router.post('/post')`
 
 
 ## 安裝專案
