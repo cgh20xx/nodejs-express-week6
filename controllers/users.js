@@ -186,24 +186,79 @@ const users = {
    * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.findByIdAndUpdate
    */
   async updatPassword(req, res, next) {
-    console.log('updatPassword');
-    successResponse(res, { updatPassword: 1 });
+    // 注意：req.user 在 isAuth middleware 驗証成功後會自動帶入的。
+    console.log(req.user);
+    let { password, confirmPassword } = req.body;
+    // 檢查 password 空值
+    password = password?.trim();
+    if (!password) {
+      return next(
+        new AppError({
+          statusCode: 400,
+          message: '[重設密碼失敗] password 未填寫',
+        })
+      );
+    }
+
+    // 密碼 8 碼以上
+    if (!validator.isLength(password, { min: 8 })) {
+      return next(
+        new AppError({
+          statusCode: 400,
+          message: '[重設密碼失敗] password 長度少於8碼',
+        })
+      );
+    }
+
+    // 檢查 confirmPassword 空值
+    confirmPassword = confirmPassword?.trim();
+    if (!confirmPassword) {
+      return next(
+        new AppError({
+          statusCode: 400,
+          message: '[重設密碼失敗] confirmPassword 未填寫',
+        })
+      );
+    }
+
+    // 檢查 password confirmPassword 是否一致
+    if (password !== confirmPassword) {
+      return next(
+        new AppError({
+          statusCode: 400,
+          message: '[重設密碼失敗] password 不一致',
+        })
+      );
+    }
+
+    // 存進資料庫的密碼需加密過
+    const newPassword = await bcrypt.hash(password, 12);
+
+    const user = await UserModel.findByIdAndUpdate(req.user.id, {
+      password: newPassword,
+    });
+    //  產生 jwt token
+    const token = generateJWT(user._id);
+
+    successResponse(res, { token, name: user.name });
   },
   /**
    * 取得個人資料 (需登入)
    * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.findByIdAndUpdate
    */
   async getProfile(req, res, next) {
-    console.log('getProfile');
-    successResponse(res, { getProfile: 1 });
+    // 注意：req.user 在 isAuth middleware 驗証成功後會自動帶入的。
+    console.log('getProfile req.user:', req.user);
+    successResponse(res, req.user);
   },
   /**
    * 更新個人資料 (需登入)
    * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.findByIdAndUpdate
    */
   async updateProfile(req, res, next) {
-    console.log('updateProfile');
-    successResponse(res, { updateProfile: 1 });
+    // 注意：req.user 在 isAuth middleware 驗証成功後會自動帶入的。
+    console.log('updateProfile req.user:', req.user);
+    successResponse(res, req.user);
   },
   /**
    * 取得所有使用者
