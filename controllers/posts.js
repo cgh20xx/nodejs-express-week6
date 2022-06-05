@@ -32,30 +32,10 @@ const posts = {
    * @param {Object} res
    */
   async createPost(req, res, next) {
-    // 移除 try catch 改為 return appError();
-    // 移除 PostModel try catch
-
+    // 注意：req.user 在 isAuth middleware 驗証成功後會自動帶入的。
     // next 第一個參數是 Error 的話，會導向 app.use(function (err, req, res, next) {])
+    const user = req.user; // 登入成功就會取得 user，應該不需再判斷 user 是否存在。
     const { body } = req;
-    if (!body.user)
-      return next(
-        new AppError({
-          statusCode: 400,
-          message: '[新增貼文失敗] user id 未填寫',
-        })
-      );
-
-    // POST 新增貼文時，斷有沒有這個使用者，
-    // 如果傳入不存在的 id ( 相似 id 但使用者資料庫中沒有此 id )，
-    // 也會被新增成功，但 user 會是 null。
-    const findUser = await UserModel.findById(body.user);
-    if (!findUser)
-      return next(
-        new AppError({
-          statusCode: 400,
-          message: '[新增貼文失敗] user id 不存在',
-        })
-      );
 
     body.content = body.content?.trim(); // 頭尾去空白
     if (!body.content)
@@ -70,7 +50,7 @@ const posts = {
     // 現在 await PostModel.create 不再需要 try catch 包起來
     // 若 mongoose 發生 validationError 會被 handleErrorAsync 裡的 catch 統一處理！
     const newPost = await PostModel.create({
-      user: body.user,
+      user: user.id,
       content: body.content,
       image: body.image,
       // tags: body.tags,
