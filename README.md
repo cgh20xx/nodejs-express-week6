@@ -3,8 +3,8 @@
 - 註冊會員 (取得JWT) `router.post('/user/sign_up')`
 - 會員登入 (取得JWT) `router.post('/user/log_in')`
 - 重設密碼 (需登入) `router.post('/user/update_password')`
-- 取得個人資料 (需登入) `router.get('/user/:id')`
-- 更新個人資料 (需登入) `router.patch('/user/:id')`
+- 取得個人資料 (需登入) `router.get('/user/profile')`
+- 更新個人資料 (需登入) `router.patch('/user/profile')`
 
 ## LV2：調整第四週 API，都加上登入驗證的 middleware
 - 觀看所有貼文 `router.get('/posts')`
