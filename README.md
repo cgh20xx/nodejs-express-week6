@@ -1,14 +1,25 @@
-# nodejs-express-week5
-- 請設計一個 middleware，讓 controller 程式碼裡面沒有 try catch
-- 請透過環境變數執行指令加上 dev、production 的客製化回饋
-- 承第二點，請觀看此張圖，確保你的後端語言有客製化各種錯誤狀態，包含 NPM 的錯誤訊息客製化
-- 請透過 node.js uncaughtException、unhandledRejection 來捕捉預期外的錯誤
+# nodejs-express-week6
+## LV1：設計五個會員相關 API
+- 註冊會員 (新增單筆使用者)
+`router.post('/user/sign_up')`
+
+- 登入 (發 JWT)
+`router.post('/user/log_in')`
+
+- 重設密碼
+`router.post('/user/update_password')`
+
+- 取得個人資料 (取得單筆使用者)
+`router.get('/user/:id')`
+
+- 更新個人資料 (修改單筆使用者)
+`router.patch('/user/:id')`
 
 
 ## 安裝專案
 ```
-$ git clone git@github.com:cgh20xx/nodejs-express-week5.git
-$ cd nodejs-express-week5
+$ git clone git@github.com:cgh20xx/nodejs-express-week6.git
+$ cd nodejs-express-week6
 $ npm install
 ```
 
