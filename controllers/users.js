@@ -190,6 +190,22 @@ const users = {
     successResponse(res, { updatPassword: 1 });
   },
   /**
+   * 取得個人資料 (需登入)
+   * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.findByIdAndUpdate
+   */
+  async getProfile(req, res, next) {
+    console.log('getProfile');
+    successResponse(res, { getProfile: 1 });
+  },
+  /**
+   * 更新個人資料 (需登入)
+   * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.findByIdAndUpdate
+   */
+  async updateProfile(req, res, next) {
+    console.log('updateProfile');
+    successResponse(res, { updateProfile: 1 });
+  },
+  /**
    * 取得所有使用者
    * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.find
    */
@@ -197,32 +213,9 @@ const users = {
     const allUser = await UserModel.find();
     successResponse(res, allUser);
   },
+
   /**
-   * 刪除所有使用者
-   * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.deleteMany
-   */
-  async deleteUsers(req, res, next) {
-    await UserModel.deleteMany({});
-    successResponse(res, []);
-  },
-  /**
-   * 刪除單筆使用者
-   * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.findByIdAndDelete
-   */
-  async deleteUserById(req, res, next) {
-    const id = req.params.id;
-    const deleteUserById = await UserModel.findByIdAndDelete(id);
-    if (!deleteUserById)
-      return next(
-        new AppError({
-          statusCode: 400,
-          message: '[刪除使用者失敗] 沒有此 id',
-        })
-      );
-    successResponse(res, deleteUserById);
-  },
-  /**
-   * 取得個人資料 (取得單筆使用者)
+   * 取得單筆使用者
    * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.findById
    */
   async getUserById(req, res, next) {
@@ -230,7 +223,7 @@ const users = {
     successResponse(res, { getUserById: 1 });
   },
   /**
-   * 更新個人資料 (修改單筆使用者)
+   * 修改單筆使用者
    * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.findByIdAndUpdate
    */
   async updateUserById(req, res, next) {
@@ -272,6 +265,30 @@ const users = {
         })
       );
     successResponse(res, updateUserById);
+  },
+  /**
+   * 刪除所有使用者
+   * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.deleteMany
+   */
+  async deleteUsers(req, res, next) {
+    await UserModel.deleteMany({});
+    successResponse(res, []);
+  },
+  /**
+   * 刪除單筆使用者
+   * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.findByIdAndDelete
+   */
+  async deleteUserById(req, res, next) {
+    const id = req.params.id;
+    const deleteUserById = await UserModel.findByIdAndDelete(id);
+    if (!deleteUserById)
+      return next(
+        new AppError({
+          statusCode: 400,
+          message: '[刪除使用者失敗] 沒有此 id',
+        })
+      );
+    successResponse(res, deleteUserById);
   },
 };
 module.exports = users;

@@ -17,19 +17,25 @@ router.post(
   handleErrorAsync(UsersController.updatPassword)
 );
 
+// 取得個人資料 (需登入)
+router.get('/user/profile', handleErrorAsync(UsersController.getProfile));
+
+// 更新個人資料 (需登入)
+router.patch('/user/profile', handleErrorAsync(UsersController.updateProfile));
+
 // 取得所有使用者
 router.get('/users', handleErrorAsync(UsersController.getUsers));
+
+// 取得單筆使用者
+router.get('/user/:id', handleErrorAsync(UsersController.getUserById));
+
+// 修改單筆使用者
+router.patch('/user/:id', handleErrorAsync(UsersController.updateUserById));
 
 // 刪除所有使用者
 router.delete('/users', handleErrorAsync(UsersController.deleteUsers));
 
 // 刪除單筆使用者
 router.delete('/user/:id', handleErrorAsync(UsersController.deleteUserById));
-
-// 取得個人資料 (取得單筆使用者)
-router.get('/user/:id', handleErrorAsync(UsersController.getUserById));
-
-// 更新個人資料 (修改單筆使用者)
-router.patch('/user/:id', handleErrorAsync(UsersController.updateUserById));
 
 module.exports = router;
