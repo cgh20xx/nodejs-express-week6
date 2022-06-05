@@ -10,7 +10,6 @@ const users = {
    * Doc:https://mongoosejs.com/docs/api/model.html#model_Model.create
    */
   async signUp(req, res, next) {
-    console.log('signUp');
     let { name, email, password, confirmPassword } = req.body;
     // 檢查 name 空值
     name = name?.trim();
@@ -35,6 +34,7 @@ const users = {
     }
 
     // 檢查 email 格式
+    // validator Doc: https://www.npmjs.com/package/validator
     if (!validator.isEmail(email)) {
       return next(
         new AppError({
@@ -46,7 +46,7 @@ const users = {
 
     // 檢查 email 是否已存在 DB
     const existUser = await UserModel.findOne({
-      email: email,
+      email,
     });
     if (existUser) {
       return next(
@@ -118,8 +118,67 @@ const users = {
    * 登入 (發 JWT)
    */
   async logIn(req, res, next) {
-    console.log('logIn');
-    successResponse(res, { logIn: 1 });
+    let { email, password } = req.body;
+    // 檢查 email 空值
+    email = email?.trim();
+    if (!email) {
+      return next(
+        new AppError({
+          statusCode: 400,
+          message: '[登入失敗] email 未填寫',
+        })
+      );
+    }
+
+    // 檢查 password 空值
+    password = password?.trim();
+    if (!password) {
+      return next(
+        new AppError({
+          statusCode: 400,
+          message: '[登入失敗] password 未填寫',
+        })
+      );
+    }
+
+    // 用 email 找使用者
+    const existUser = await UserModel.findOne({
+      email,
+    }).select('+password');
+
+    if (!existUser) {
+      // 該 email 找不到使用者，也不要直接回 email 不存在，否則容易被 try email。
+      return next(
+        new AppError({
+          statusCode: 400,
+          message: '[登入失敗] email or password 錯誤',
+        })
+      );
+    }
+
+    // 比對傳入的 email 與資料庫中是否相同
+    // bcrypt Doc:https://www.npmjs.com/package/bcrypt
+    const isPasswordSame = await bcrypt.compare(password, existUser.password);
+    if (!isPasswordSame) {
+      // 密碼錯，也不要直接回密碼錯，否則容易被 try password。
+      return next(
+        new AppError({
+          statusCode: 400,
+          message: '[登入失敗] email or password 錯誤',
+        })
+      );
+    }
+
+    // 到這步表示 email password 都驗証成功
+    // 產生 jwt token
+    const token = generateJWT(existUser._id);
+
+    successResponse(res, {
+      token,
+      _id: existUser._id,
+      name: existUser.name,
+      photo: existUser.photo,
+    });
   },
 
   /**
